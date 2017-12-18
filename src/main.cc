@@ -28,6 +28,10 @@
 #include "git_hash.hh"
 #include "git_vers.hh"
 
+#ifdef HAVE_CALIPER
+#include <caliper/cali.h>
+#endif
+
 static constexpr int NT = 64;
 
 __global__ __launch_bounds__(NT) static void CycleTrackingGuts( KERNEL_ARGS const int ipMin, int ipMax, Device device, const int maxCount, int *__restrict__ const sendCounts, MessageParticle *__restrict__ const sendParts)
@@ -142,6 +146,9 @@ MonteCarlo *mcco  = NULL;
 
 int main(int argc, char** argv)
 {
+#ifdef HAVE_CALIPER
+   CALI_CXX_MARK_FUNCTION;
+#endif
    mpiInit(&argc, &argv);
    printBanner(GIT_VERS, GIT_HASH);
 

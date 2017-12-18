@@ -94,6 +94,11 @@ CXXFLAGS = -g -O2
 CPPFLAGS = -DHAVE_MPI
 LDFLAGS =
 
+CALIPER_DIR = $(HOME)/local/src/caliper/install/linux-rhel7-x86_64/
+CALIPER_CPPFLAGS = -DHAVE_CALIPER
+CALIPER_CXXFLAGS = -I$(CALIPER_DIR)/include
+CALIPER_LDFLAGS = -L$(CALIPER_DIR)/lib64 -lcaliper -lcaliper-mpi
+
 ###############################################################################
 # Very simple GCC build with OpenMP but without MPI.  
 # This works on a Macbook (if gcc is installed)
@@ -112,15 +117,15 @@ LDFLAGS =
 ###############################################################################
 ### GCC -- with MPI and OpenMP 
 ###############################################################################
-#OPENMP_FLAGS = -DHAVE_OPENMP -fopenmp
-#OPENMP_LDFLAGS = -fopenmp
-#MPI_FLAGS = -DHAVE_MPI
-#OPTFLAGS = -g -O2
-#
-#CXX=mpicxx
-#CXXFLAGS = -std=c++11 $(OPTFLAGS) -Wpedantic
-#CPPFLAGS = $(MPI_FLAGS) $(OPENMP_FLAGS)
-#LDFLAGS = $(OPENMP_LDFLAGS) 
+OPENMP_FLAGS = -DHAVE_OPENMP -fopenmp
+OPENMP_LDFLAGS = -fopenmp
+MPI_FLAGS = -DHAVE_MPI
+OPTFLAGS = -g -O2
+
+CXX=mpicxx
+CXXFLAGS = -std=c++11 $(OPTFLAGS) $(CALIPER_CXXFLAGS)
+CPPFLAGS = $(MPI_FLAGS) $(OPENMP_FLAGS) $(CALIPER_CPPFLAGS)
+LDFLAGS = $(OPENMP_LDFLAGS) $(CALIPER_LDFLAGS)
 
 
 ###############################################################################
