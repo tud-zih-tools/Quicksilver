@@ -1,4 +1,7 @@
 #include "MC_Domain.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <vector>
 #include <map>
 #include <utility>
@@ -79,6 +82,9 @@ MC_Mesh_Domain::MC_Mesh_Domain(const MeshPartition& meshPartition, const GlobalF
                                const qs_vector<MC_Subfacet_Adjacency_Event::Enum>& boundaryCondition)
 : _domainGid(meshPartition.domainGid())
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    _nbrDomainGid.resize(meshPartition.nbrDomains().size());
    for (unsigned ii=0; ii< _nbrDomainGid.size(); ++ii)
       _nbrDomainGid[ii] = meshPartition.nbrDomains()[ii];
@@ -164,6 +170,9 @@ namespace
                          const MeshPartition& partition,
                          const GlobalFccGrid& grid)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       map<Long64, int> faceCenters;
       vector<Long64> nodeGid;
       for (auto iter=partition.begin(); iter!=partition.end(); ++iter)
@@ -203,6 +212,9 @@ namespace
                    const qs_vector<MC_Subfacet_Adjacency_Event::Enum>& boundaryCondition)
 
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       map<int, int> nbrDomainIndex; // nbrDomainIndex[domainGid] = localNbrIndex;
 
       for (unsigned ii=0; ii<nbrDomain.size(); ++ii)
@@ -294,6 +306,9 @@ namespace
                   int* nodeIndex,
                   const vector<FaceInfo>& faceInfo)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       const int& facetId = location.facet;
       int faceId = facetId / 4;
 
@@ -320,6 +335,9 @@ namespace
 MC_Vector findCellCenter(const MC_Facet_Adjacency_Cell& cell,
                          const qs_vector<MC_Vector>& node)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    // find center of cell
    MC_Vector cellCenter(0., 0., 0.);
    for ( int iter=0; iter < cell.num_points; iter++)
@@ -334,6 +352,9 @@ MC_Vector findCellCenter(const MC_Facet_Adjacency_Cell& cell,
 double cellVolume(const MC_Facet_Adjacency_Cell& cell,
                   const qs_vector<MC_Vector>& node)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    // find center of cell
    MC_Vector cellCenter(0., 0., 0.);
    for ( int iter=0; iter < cell.num_points; iter++)
@@ -362,6 +383,9 @@ MC_Domain::MC_Domain(const MeshPartition& meshPartition, const GlobalFccGrid& gr
   global_domain(meshPartition.domainGid()),
   mesh(meshPartition, grid, ddc, getBoundaryCondition(params))
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    cell_state.resize(mesh._cellGeometry.size(), VAR_MEM);
    _cachedCrossSectionStorage.setCapacity(cell_state.size() * numEnergyGroups, VAR_MEM);
 
@@ -394,6 +418,9 @@ MC_Domain::MC_Domain(const MeshPartition& meshPartition, const GlobalFccGrid& gr
 
 void MC_Domain::clearCrossSectionCache(int numEnergyGroups)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    for (unsigned ii=0; ii<cell_state.size(); ++ii)
       for (unsigned jj=0; jj<numEnergyGroups; ++jj)
          cell_state[ii]._total[jj] = 0.;
@@ -405,6 +432,9 @@ namespace
    // geometry.  False otherwise
    bool isInside(const GeometryParameters& geom, const MC_Vector& rr)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       bool inside = false;
       switch (geom.shape)
       {
@@ -438,6 +468,9 @@ namespace
 {
    string findMaterial(const Parameters& params, const MC_Vector& rr)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       string materialName;
       for (unsigned ii=0; ii< params.geometryParams.size(); ++ii)
          if (isInside(params.geometryParams[ii], rr))
@@ -453,6 +486,9 @@ namespace
 {
    qs_vector<MC_Subfacet_Adjacency_Event::Enum> getBoundaryCondition(const Parameters& params)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       qs_vector<MC_Subfacet_Adjacency_Event::Enum> bc(6);
       if (params.simulationParams.boundaryCondition == "reflect")
          bc = qs_vector<MC_Subfacet_Adjacency_Event::Enum>(6, MC_Subfacet_Adjacency_Event::Boundary_Reflection);

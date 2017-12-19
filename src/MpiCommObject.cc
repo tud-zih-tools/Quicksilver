@@ -1,4 +1,7 @@
 #include "MpiCommObject.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "qs_assert.hh"
 #include <algorithm>
 #include "MeshPartition.hh"
@@ -20,6 +23,9 @@ MpiCommObject::MpiCommObject(const MPI_Comm& comm, const DecompositionObject& dd
 :_comm(comm),
  _ddc(ddc)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 }
 
 void MpiCommObject::exchange(MeshPartition::MapType& cellInfoMap,
@@ -28,6 +34,9 @@ void MpiCommObject::exchange(MeshPartition::MapType& cellInfoMap,
                              vector<set<Long64> > recvSet)
 
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int nRanks, myRank;
    mpiComm_rank(MPI_COMM_WORLD, &myRank);
    mpiComm_size(MPI_COMM_WORLD, &nRanks);
@@ -99,6 +108,9 @@ void MpiCommObject::exchange(MeshPartition::MapType& cellInfoMap,
 void MpiCommObject::exchange(vector<FacetPair> sendBuf,
                              vector<FacetPair>& recvBuf)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    sort(&sendBuf[0], &sendBuf[sendBuf.size()-1], compareDomainGid2);
    vector<int> sendOffset(sendBuf.size());
    sendOffset.push_back(0);
@@ -148,6 +160,9 @@ namespace
 {
    MPI_Datatype cellInfoMpiType()
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       static MPI_Datatype datatype;
       static bool inititalized = false;
       if (! inititalized )
@@ -164,6 +179,9 @@ namespace
 {
    MPI_Datatype facetPairMpiType()
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       static MPI_Datatype datatype;
       static bool inititalized = false;
       if (! inititalized )

@@ -1,4 +1,7 @@
 #include "NuclearData.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <cmath>
 #include "MC_RNG_State.hh"
 #include "DeclareMacro.hh"
@@ -16,6 +19,9 @@ NuclearDataReaction::NuclearDataReaction(
   _reactionType(reactionType),
   _nuBar(nuBar)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int nGroups = _crossSection.size();
 
    for (int ii=0; ii<nGroups; ++ii)
@@ -84,6 +90,9 @@ void NuclearDataSpecies::addReaction(
    NuclearDataReaction::Enum type, double nuBar,
    qs_vector<double> &energies, const Polynomial& polynomial, double reactionCrossSection)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    _reactions.Open();
    _reactions.push_back(NuclearDataReaction(type, nuBar, energies, polynomial, reactionCrossSection));
    _reactions.Close();
@@ -94,6 +103,9 @@ void NuclearDataSpecies::addReaction(
 // Set up the energies boundaries of the neutron
 NuclearData::NuclearData(int numGroups, double energyLow, double energyHigh) : _energies( numGroups+1,VAR_MEM)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    qs_assert (energyLow < energyHigh);
    _numEnergyGroups = numGroups;
    _energies[0] = energyLow;
@@ -117,6 +129,9 @@ int NuclearData::addIsotope(
    double totalCrossSection,
    double fissionWeight, double scatterWeight, double absorptionWeight)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    _isotopes.Open();
    _isotopes.push_back(NuclearDataIsotope());
    _isotopes.Close();
@@ -192,6 +207,9 @@ int NuclearData::getNumberReactions(unsigned int isotopeIndex)
 // For this energy, return the group index
 int NuclearData::getEnergyGroup(double energy)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int numEnergies = (int)_energies.size();
    if (energy <= _energies[0]) return 0;
    if (energy > _energies[numEnergies-1]) return numEnergies-1;

@@ -1,4 +1,7 @@
 #include "PopulationControl.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "MC_Processor_Info.hh"
 #include "MonteCarlo.hh"
 #include "Globals.hh"
@@ -20,6 +23,9 @@ namespace
 
 void PopulationControl(MonteCarlo* monteCarlo, bool loadBalance)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     NVTX_Range range("PopulationControl");
 
     uint64_t targetNumParticles = monteCarlo->_params.simulationParams.nParticles;
@@ -69,6 +75,9 @@ namespace
 {
 void PopulationControlGuts(const double splitRRFactor, uint64_t currentNumParticles, ParticleVaultContainer* my_particle_vault, Balance& taskBalance)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     uint64_t vault_size = my_particle_vault->getVaultSize();
     assert(currentNumParticles < vault_size);
     ParticleVault& taskProcessingVault = *( my_particle_vault->getTaskProcessingVault() );
@@ -120,6 +129,9 @@ void PopulationControlGuts(const double splitRRFactor, uint64_t currentNumPartic
 // Roulette low-weight particles relative to the source particle weight.
 void RouletteLowWeightParticles(MonteCarlo* monteCarlo)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     NVTX_Range range("RouletteLowWeightParticles");
 
     const double lowWeightCutoff = monteCarlo->_params.simulationParams.lowWeightCutoff;

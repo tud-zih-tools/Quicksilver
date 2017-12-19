@@ -1,4 +1,7 @@
 #include "DecompositionObject.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <stdlib.h>
 #include <algorithm>
 #include <utility>
@@ -15,6 +18,9 @@ namespace
 {
    void fisherYates(vector<int>& vv)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       int nItems = vv.size();
       for (unsigned ii=0; ii<nItems-1; ++ii)
       {
@@ -27,6 +33,9 @@ namespace
 DecompositionObject::DecompositionObject(
    int myRank, int nRanks, int nDomainsPerRank, int mode)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    qs_assert(mode == 0 || mode == 1);
 
    int nDomains = nRanks*nDomainsPerRank;

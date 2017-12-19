@@ -1,4 +1,7 @@
 #include "CoralBenchmark.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "MonteCarlo.hh"
 #include "Parameters.hh"
 #include "Tallies.hh"
@@ -16,6 +19,9 @@ void FluenceTest( MonteCarlo* monteCarlo );
 //
 void coralBenchmarkCorrectness( MonteCarlo* monteCarlo, Parameters &params )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     if( !params.simulationParams.coralBenchmark )
         return;
 
@@ -45,6 +51,9 @@ void coralBenchmarkCorrectness( MonteCarlo* monteCarlo, Parameters &params )
 
 void BalanceRatioTest( MonteCarlo *monteCarlo, Parameters &params )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     fprintf(stdout,"\n");
     fprintf(stdout, "Testing Ratios for Absorbtion, Fission, and Scattering are maintained\n");
 
@@ -118,6 +127,9 @@ void BalanceRatioTest( MonteCarlo *monteCarlo, Parameters &params )
 
 void BalanceEventTest( MonteCarlo *monteCarlo )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 
     fprintf(stdout,"\n");
     fprintf(stdout, "Testing balance between number of facet crossings and reactions\n");
@@ -151,6 +163,9 @@ void BalanceEventTest( MonteCarlo *monteCarlo )
 
 void MissingParticleTest( MonteCarlo *monteCarlo )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     fprintf(stdout,"\n");
     fprintf(stdout, "Test for lost / unaccounted for particles in this simulation\n");
 
@@ -176,6 +191,9 @@ void MissingParticleTest( MonteCarlo *monteCarlo )
 
 void FluenceTest( MonteCarlo* monteCarlo )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     if( monteCarlo->processor_info->rank == 0 )
     {
         fprintf(stdout,"\n");

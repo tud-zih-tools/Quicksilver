@@ -1,4 +1,7 @@
 /// \file
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 /// A parser for command line arguments.
 ///
 /// A general purpose command line parser that uses getopt_long() to parse
@@ -35,6 +38,9 @@ static MyOption* myargs=NULL;
 
 static char* dupString(const char* s)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    char* d;
    if ( ! s ) s = "";
    d = (char*)qsCalloc((strlen(s)+1),sizeof(char));
@@ -46,6 +52,9 @@ static MyOption* myOptionAlloc(
    const char* longOption, const char shortOption,
    int has_arg, const char type, void* dataPtr, int dataSize, const char* help)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    static int iBase=129;
    MyOption* o = (MyOption*)qsCalloc(1, sizeof(MyOption));
    o->help = dupString(help);
@@ -66,6 +75,9 @@ static MyOption* myOptionAlloc(
 
 static MyOption* myOptionFree(MyOption* o)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    MyOption* r;
    if(!o) return NULL;
    r = nextOption(o);
@@ -77,6 +89,9 @@ static MyOption* myOptionFree(MyOption* o)
 
 static MyOption* lastOption(MyOption* o)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    if ( ! o) return o;
    while(nextOption(o)) o = nextOption(o);
    return o;
@@ -84,6 +99,9 @@ static MyOption* lastOption(MyOption* o)
 
 static MyOption* findOption(MyOption* o, unsigned char shortArg)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    while(o)
    {
       if (o->shortArg[0] == shortArg) return o;
@@ -97,6 +115,9 @@ int addArg(const char* longOption, const char shortOption,
            int has_arg, const char type, void* dataPtr, int dataSize,
            const char* help)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    MyOption* o;
    MyOption* p;
    o = myOptionAlloc(longOption,shortOption,has_arg,type,dataPtr,dataSize, help);
@@ -113,6 +134,9 @@ int addArg(const char* longOption, const char shortOption,
 
 void freeArgs()
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    while(myargs)
    {
       myargs = myOptionFree(myargs);
@@ -122,6 +146,9 @@ void freeArgs()
 
 void printArgs()
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    MyOption* o = myargs;
    char s[4096];
    unsigned char *shortArg;
@@ -143,6 +170,9 @@ void printArgs()
 
 void processArgs(int argc, char** argv)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    MyOption* o;
    int n=0;
    struct option* opts;

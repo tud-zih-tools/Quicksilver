@@ -1,4 +1,7 @@
 #include "utils.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <cstdio>
 #include "qs_assert.hh"
 #include "utilsMpi.hh"
@@ -16,6 +19,9 @@
 // Otherwise, returns omp_get_num_procs()
 int mc_get_num_physical_procs(void)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int num_physical_cores = omp_get_num_procs();
    return num_physical_cores;
 }
@@ -23,11 +29,17 @@ int mc_get_num_physical_procs(void)
 
 void MC_Verify_Thread_Zero(char const * const file, int line)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     return;
 }
 
 void printBanner(const char *git_version, const char *git_hash)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     int rank = -1, size=-1, mpi_major=0, mpi_minor=0;
     mpiComm_rank(MPI_COMM_WORLD, &rank);
     mpiComm_size(MPI_COMM_WORLD, &size);
@@ -50,6 +62,9 @@ void printBanner(const char *git_version, const char *git_hash)
 
 void Print0(const char *format, ...)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     int rank = -1;
     mpiComm_rank(MPI_COMM_WORLD, &rank);
 
@@ -70,6 +85,9 @@ void Print0(const char *format, ...)
 //----------------------------------------------------------------------------------------------------------------------
 std::string MC_String(const char fmt[], ...)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     va_list args;
     va_start(args, fmt);
     int chars_needed = vsnprintf(NULL, 0, fmt, args);

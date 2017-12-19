@@ -1,4 +1,7 @@
 #include "SharedMemoryCommObject.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "qs_assert.hh"
 #include "MeshPartition.hh"
 
@@ -9,6 +12,9 @@ using std::vector;
 SharedMemoryCommObject::SharedMemoryCommObject(vector<MeshPartition>& meshPartition)
 :_partitions(meshPartition)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    _gidToIndex.resize(_partitions.size());
    for (unsigned ii=0; ii<_partitions.size(); ++ii)
    {
@@ -25,6 +31,9 @@ void SharedMemoryCommObject::exchange(MeshPartition::MapType& cellInfoMap,
                                       vector<set<Long64> > recvSet)
 
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    for (unsigned ii=0; ii<nbrDomain.size(); ++ii)
    {
       const int& targetDomainGid = nbrDomain[ii];
@@ -44,6 +53,9 @@ void SharedMemoryCommObject::exchange(MeshPartition::MapType& cellInfoMap,
 void SharedMemoryCommObject::exchange(vector<FacetPair> sendBuf,
                                       vector<FacetPair>& recvBuf)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    // This type of exchange should never occur in SharedMemory spaces.
    qs_assert(false);
 }

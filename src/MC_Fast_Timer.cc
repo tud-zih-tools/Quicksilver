@@ -1,4 +1,7 @@
 #include "MC_Fast_Timer.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <vector>
 #include "MonteCarlo.hh"
 #include "MC_Processor_Info.hh"
@@ -18,6 +21,9 @@ static double mc_std_dev(uint64_t const data[], int const nelm);
 
 static double mc_std_dev(uint64_t const data[], int const nelm)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     uint64_t mean=0.0, sum_deviation=0.0;
 
     for(int ndx=0; ndx<nelm; ++ndx) { mean+=data[ndx]; }
@@ -28,6 +34,9 @@ static double mc_std_dev(uint64_t const data[], int const nelm)
 
 void MC_Fast_Timer_Container::Print_Last_Cycle_Heading(int mpi_rank)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 #ifdef DISABLE_TIMERS
   return;
 #endif
@@ -42,6 +51,9 @@ void MC_Fast_Timer_Container::Print_Last_Cycle_Heading(int mpi_rank)
 
 void MC_Fast_Timer_Container::Print_Cumulative_Heading(int mpi_rank)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 #ifdef DISABLE_TIMERS
   return;
 #endif
@@ -55,6 +67,9 @@ void MC_Fast_Timer_Container::Print_Cumulative_Heading(int mpi_rank)
 
 void MC_Fast_Timer_Container::Cumulative_Report(int mpi_rank, int num_ranks, MPI_Comm comm_world, uint64_t numSegments)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 #ifdef DISABLE_TIMERS
   return;
 #endif
@@ -104,6 +119,9 @@ void MC_Fast_Timer_Container::Cumulative_Report(int mpi_rank, int num_ranks, MPI
 
 void MC_Fast_Timer_Container::Last_Cycle_Report(int report_time, int mpi_rank, int num_ranks, MPI_Comm comm_world)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 #ifdef DISABLE_TIMERS
   return;
 #endif

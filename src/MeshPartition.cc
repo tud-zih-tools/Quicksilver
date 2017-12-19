@@ -1,4 +1,7 @@
 #include "MeshPartition.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 
 #include <queue>
 #include <set>
@@ -44,6 +47,9 @@ MeshPartition::MeshPartition(int domainGid, int domainIndex, int foreman)
   _domainIndex(domainIndex),
   _foreman(foreman)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 }
 
 // The flooding algorithm used to identify all of the cells in the given
@@ -70,6 +76,9 @@ void MeshPartition::buildMeshPartition(const GlobalFccGrid& grid,
                                        const vector<MC_Vector> centers,
                                        CommObject* comm)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    assignCellsToDomain(_cellInfoMap, _nbrDomains,
                        _domainGid,  centers, grid);
 
@@ -86,6 +95,9 @@ namespace
                             const vector<MC_Vector>& domainCenter,
                             const GlobalFccGrid& grid)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       GridAssignmentObject assigner(domainCenter);
       queue<Long64> floodQueue;
       set<Long64>   wetCells;
@@ -132,6 +144,9 @@ namespace
                           const GlobalFccGrid& grid,
                           CommObject* comm)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       int nLocalCells = 0;
       vector<set<Long64> > sendSet(nbrDomain.size());
       vector<set<Long64> > recvSet(nbrDomain.size());
@@ -185,6 +200,9 @@ namespace
                        queue<Long64>& floodQueue,
                        set<Long64>& wetCells)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       Tuple tt = grid.cellIndexToTuple(iCell);
       for (int ii=-1; ii<2; ++ii)
          for (int jj=-1; jj<2; ++jj)

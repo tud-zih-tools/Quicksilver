@@ -1,4 +1,7 @@
 #include "GridAssignmentObject.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <stdlib.h>
 #include <algorithm>
 #include <cstdio>
@@ -76,6 +79,9 @@ GridAssignmentObject::GridAssignmentObject(const vector<MC_Vector>& centers)
 
 int GridAssignmentObject::nearestCenter(const MC_Vector r)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    double r2Min = 1e300;
    int minCenter = -1;
 
@@ -120,6 +126,9 @@ int GridAssignmentObject::nearestCenter(const MC_Vector r)
 
 Tuple GridAssignmentObject::whichCellTuple(const MC_Vector r) const
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int ix = (r.x-_corner.x)/_dx;
    int iy = (r.y-_corner.y)/_dy;
    int iz = (r.z-_corner.z)/_dz;
@@ -135,16 +144,25 @@ Tuple GridAssignmentObject::whichCellTuple(const MC_Vector r) const
 
 int GridAssignmentObject::whichCell(const MC_Vector r) const
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    return tupleToIndex(whichCellTuple(r));
 }
 
 int GridAssignmentObject::tupleToIndex(Tuple tuple) const
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    return tuple.x() + _nx * (tuple.y() + _ny*tuple.z());
 }
 
 Tuple GridAssignmentObject::indexToTuple(int index) const
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int ix = index % _nx;
    index /= _nx;
    int iy = index % _ny;
@@ -158,6 +176,9 @@ Tuple GridAssignmentObject::indexToTuple(int index) const
  * the location of the particle within the cell in which it lies.  */
 double GridAssignmentObject::minDist2(const MC_Vector r, int iCell) const
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    Tuple ir = whichCellTuple(r);
    Tuple iTuple = indexToTuple(iCell);
 
@@ -170,6 +191,9 @@ double GridAssignmentObject::minDist2(const MC_Vector r, int iCell) const
 
 void GridAssignmentObject::addTupleToQueue(Tuple iTuple)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int index = tupleToIndex(iTuple);
    if (_grid[index]._burned)
       return;
@@ -180,6 +204,9 @@ void GridAssignmentObject::addTupleToQueue(Tuple iTuple)
 
 void GridAssignmentObject::addNbrsToQueue(int iCell)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    Tuple iTuple = indexToTuple(iCell);
    iTuple.x() += 1; if (iTuple.x() < _nx) addTupleToQueue(iTuple);
    iTuple.x() -= 2; if (iTuple.x() >= 0)  addTupleToQueue(iTuple);

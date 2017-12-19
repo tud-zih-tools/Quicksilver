@@ -1,10 +1,16 @@
 #include "ParticleVault.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "MC_Processor_Info.hh"
 #include "Globals.hh"
 
 void ParticleVault::
 collapse( size_t fill_size, ParticleVault* vault2 )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     //The entirety of vault 2 fits in the space available in this vault 
     if( vault2->size() < fill_size )
     {

@@ -1,4 +1,7 @@
 #include "MonteCarlo.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "NuclearData.hh"
 #include "MaterialDatabase.hh"
 #include "ParticleVaultContainer.hh"
@@ -22,6 +25,9 @@ MonteCarlo::MonteCarlo(const Parameters& params)
 : _params(params),
   _nuclearData(NULL)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    _nuclearData            = 0;
    _materialDatabase       = 0;
 
@@ -57,6 +63,9 @@ MonteCarlo::MonteCarlo(const Parameters& params)
 //----------------------------------------------------------------------------------------------------------------------
 MonteCarlo::~MonteCarlo()
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
   delete _nuclearData;
   delete _particleVaultContainer;
   delete _materialDatabase;
@@ -69,6 +78,9 @@ MonteCarlo::~MonteCarlo()
 
 void MonteCarlo::clearCrossSectionCache()
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    int numEnergyGroups = _nuclearData->_numEnergyGroups;
    for (unsigned ii=0; ii<domain.size(); ++ii)
       domain[ii].clearCrossSectionCache(numEnergyGroups);

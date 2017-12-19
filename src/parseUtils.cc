@@ -1,4 +1,7 @@
 #include "parseUtils.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include <utility>
 #include "InputBlock.hh"
 
@@ -16,6 +19,9 @@ namespace
 
 bool blockStart(const string& line, string& blockName)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    string keyword;
    string value;
    int indent;
@@ -30,6 +36,9 @@ bool blockStart(const string& line, string& blockName)
 
 string readBlock(InputBlock& block, istream& in)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    string line;
    while (!in.eof())
    {
@@ -59,12 +68,18 @@ namespace
          line.erase(here, string::npos);
       return (line.find_last_not_of(whitespace) == string::npos);
    }
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
 }
 
 namespace
 {
    bool split(string line, string& keyword, string& value, int& indent)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       indent = 0;
       while (indent < line.size() && isspace(line[indent]))
          ++indent;
@@ -90,6 +105,9 @@ namespace
 {
    bool validKeyword(const string& word)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       return true;
    }
 }
@@ -98,6 +116,9 @@ namespace
 {
    void chop(string& line)
    {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
       size_t here = line.size();
       while (here > 0 && isspace(line[here-1]))
          --here;

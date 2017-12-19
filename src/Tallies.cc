@@ -1,4 +1,7 @@
 #include "Tallies.hh"
+#ifdef HAVE_CALIPER
+#include<caliper/cali.h>
+#endif
 #include "utilsMpi.hh"
 #include "MC_Time_Info.hh"
 #include "MC_Processor_Info.hh"
@@ -15,6 +18,9 @@ void Tallies::CycleInitialize(MonteCarlo* monteCarlo)
 
 void Tallies::CycleFinalize(MonteCarlo *monteCarlo)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     vector<uint64_t> tal;
     tal.reserve( 13 );
     tal.push_back(_balanceTask[0]._absorb);
@@ -74,6 +80,9 @@ void Tallies::CycleFinalize(MonteCarlo *monteCarlo)
 
 void Fluence::compute( int domainIndex, ScalarFluxDomain &scalarFluxDomain )
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     int numCells = scalarFluxDomain._task[0]._cell.size();
 
     while( this->_domain.size() <= domainIndex )
@@ -97,6 +106,9 @@ void Fluence::compute( int domainIndex, ScalarFluxDomain &scalarFluxDomain )
 
 void Tallies::PrintSummary(MonteCarlo *monteCarlo)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
    MC_FASTTIMER_STOP(MC_Fast_Timer::cycleFinalize); // stop the finalize timer to get report
 
    if ( monteCarlo->time_info->cycle == 0 )
@@ -120,6 +132,9 @@ void Tallies::PrintSummary(MonteCarlo *monteCarlo)
 
 double Tallies::ScalarFluxSum(MonteCarlo *monteCarlo)
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     double local_sum = 0.0;
 
     for (int domainIndex = 0; domainIndex < _scalarFluxDomain.size(); domainIndex++)
@@ -144,6 +159,9 @@ double Tallies::ScalarFluxSum(MonteCarlo *monteCarlo)
 
 void Tallies::InitializeTallies( MonteCarlo *monteCarlo) 
 {
+#ifdef HAVE_CALIPER
+CALI_CXX_MARK_FUNCTION;
+#endif
     if( _balanceTask.size() == 0 )
     {
         if( _balanceTask.capacity() == 0 ) 
