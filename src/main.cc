@@ -32,6 +32,20 @@
 #include <caliper/cali.h>
 #endif
 
+#ifdef HAVE_HPCTOOLKIT
+#include <hpctoolkit.h>
+#endif
+
+#ifdef HAVE_TIMEMORY
+#include <timemory/library.h>
+#endif
+
+#ifdef HAVE_SCOREP
+#include <scorep/SCOREP_User_Types.h>
+#endif
+
+#include <sys/resource.h>
+
 static constexpr int NT = 64;
 
 __global__ __launch_bounds__(NT) static void CycleTrackingGuts( KERNEL_ARGS const int ipMin, int ipMax, Device device, const int maxCount, int *__restrict__ const sendCounts, MessageParticle *__restrict__ const sendParts)
@@ -150,6 +164,14 @@ int main(int argc, char** argv)
    CALI_CXX_MARK_FUNCTION;
 #endif
    mpiInit(&argc, &argv);
+   double min_time, max_time, sum_time;
+   double local_time, start_time, end_time;
+   int numRanks = 1;
+   int myRank = 0;
+
+   start_time = MPI_Wtime();
+   MPI_Comm_size(MPI_COMM_WORLD, &numRanks);
+   MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
    printBanner(GIT_VERS, GIT_HASH);
 
    Parameters params = getParameters(argc, argv);
@@ -195,6 +217,68 @@ int main(int argc, char** argv)
    coralBenchmarkCorrectness(mcco, params);
 
    delete mcco;
+
+   // ---------------- MEMORY USAGE ---------------- //
+   int who = RUSAGE_SELF;
+   struct rusage usage;
+   int ret;
+
+   ret = getrusage(who, &usage);
+
+   long int max_getrusage;
+   MPI_Reduce(&usage.ru_maxrss, &max_getrusage, 1, MPI_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
+
+   if (myRank == 0) {
+       printf("getrusage ru_maxrss (kB):%ld\n", max_getrusage);
+   }
+
+   /*FILE* file = fopen("/proc/self/status", "r");
+   char* line = NULL;
+   char mem_type[7], peak_RSS[256], peak_virtual[256];
+   long int p_rss, p_virtual = 0;
+   size_t len = 0;
+   char *strtol_ptr;
+   ssize_t read;
+
+   while ((read = getline(&line, &len, file)) != -1) {
+       if(strstr(line, "VmHWM") != NULL) {
+           strcpy(mem_type, strtok(line , " "));
+           strcpy(peak_RSS, strtok(NULL , " "));
+           p_rss = strtol(peak_RSS, &strtol_ptr, 10);
+           //printf("proc: %d - %s - %ld=%s\n", myid, "VmHWM", p_rss, peak_RSS);
+       }
+       if(strstr(line, "VmPeak") != NULL) {
+           strcpy(mem_type, strtok(line , " "));
+           strcpy(peak_virtual, strtok(NULL , " "));
+           p_virtual = strtol(peak_virtual, &strtol_ptr, 10);
+           //printf("proc: %d - %s - %ld=%s\n", myid, "VmPeak", p_virtual, peak_virtual);
+       }
+   }
+   fclose(file);
+
+   long int sum_peak_rss, min_peak_rss, max_peak_rss;
+   MPI_Reduce(&p_rss, &sum_peak_rss, 1, MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+   MPI_Reduce(&p_rss, &min_peak_rss, 1, MPI_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
+   MPI_Reduce(&p_rss, &max_peak_rss, 1, MPI_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
+
+   long int sum_peak_virtual, min_peak_virtual, max_peak_virtual;
+   MPI_Reduce(&p_virtual, &sum_peak_virtual, 1, MPI_LONG, MPI_SUM, 0, MPI_COMM_WORLD);
+   MPI_Reduce(&p_virtual, &min_peak_virtual, 1, MPI_LONG, MPI_MIN, 0, MPI_COMM_WORLD);
+   MPI_Reduce(&p_virtual, &max_peak_virtual, 1, MPI_LONG, MPI_MAX, 0, MPI_COMM_WORLD);
+   if (myRank == 0) {
+       printf("PEAK_RSS (kB): Min: %ld s Avg: %ld s Max: %ld s\n", min_peak_rss, sum_peak_rss/numRanks, max_peak_rss);
+       printf("PEAK_Virtual (kB): Min: %ld s Avg: %ld s Max: %ld s\n", min_peak_virtual, sum_peak_virtual/numRanks, max_peak_virtual);
+   }*/
+  // ---------------- END OF MEMORY USAGE ---------------- //
+   end_time = MPI_Wtime();
+
+   local_time = end_time - start_time;
+       MPI_Reduce(&local_time, &sum_time, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
+       MPI_Reduce(&local_time, &min_time, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD);
+       MPI_Reduce(&local_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+   if (myRank == 0) {
+       std::cout << "MinTime(s):" << min_time << "-AvgTime(s):" << sum_time/numRanks << "-MaxTime(s):" << max_time << std::endl;
+   }
 
    mpiFinalize();
    
