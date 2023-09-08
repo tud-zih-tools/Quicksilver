@@ -30,12 +30,16 @@
 
 static constexpr int NT = 64;
 
-__global__ __launch_bounds__(NT) static void CycleTrackingGuts( const int ipMin, int ipMax, Device device, const int maxCount, int *__restrict__ const sendCounts, MessageParticle *__restrict__ const sendParts)
+__global__ __launch_bounds__(NT) static void CycleTrackingGuts( KERNEL_ARGS const int ipMin, int ipMax, Device device, const int maxCount, int *__restrict__ const sendCounts, MessageParticle *__restrict__ const sendParts)
 {
     __shared__ unsigned long tallies[Device::TALLIES_SIZE];
     __shared__ int sip;
 
+#if defined(HAVE_HIP)
     if (threadIdx.x < Device::TALLIES_SIZE) tallies[threadIdx.x] = 0;
+#else
+    memset(tallies,0,sizeof(tallies));
+#endif
 
     ipMax = (ipMax < 0) ? device.particleSizes[Device::PROCESSING] : ipMax;
     const int perBlock = (ipMax-ipMin+gridDim.x-1)/gridDim.x;
@@ -114,7 +118,18 @@ __global__ __launch_bounds__(NT) static void CycleTrackingGuts( const int ipMin,
     }
 
     __syncthreads();
+#if defined(HAVE_HIP)
     if ((threadIdx.x < Device::TALLIES_SIZE) && (tallies[threadIdx.x])) atomicFetchAdd(device.tallies+threadIdx.x,tallies[threadIdx.x]);
+#else
+    atomicFetchAdd(device.tallies+0,tallies[0]);
+    atomicFetchAdd(device.tallies+1,tallies[1]);
+    atomicFetchAdd(device.tallies+2,tallies[2]);
+    atomicFetchAdd(device.tallies+3,tallies[3]);
+    atomicFetchAdd(device.tallies+4,tallies[4]);
+    atomicFetchAdd(device.tallies+5,tallies[5]);
+    atomicFetchAdd(device.tallies+6,tallies[6]);
+    atomicFetchAdd(device.tallies+7,tallies[7]);
+#endif
 }
 void gameOver();
 void cycleInit( bool loadBalance );
@@ -231,10 +246,10 @@ void cycleTracking(MonteCarlo *monteCarlo)
 
     const int nMid = device.particleSizes[Device::PROCESSING]/2;
     ma.startRecvs();
-    CycleTrackingGuts<<<nb,NT>>>(0,nMid,device,ma.maxCount,ma.sendCounts,ma.sendParts);
+    launchKernel(CycleTrackingGuts,nb,NT,0,nMid,device,ma.maxCount,ma.sendCounts,ma.sendParts);
     CHECK(hipEventRecord(ma.event));
     mb.startRecvs();
-    CycleTrackingGuts<<<nb,NT>>>(nMid,-1,device,mb.maxCount,mb.sendCounts,mb.sendParts);
+    launchKernel(CycleTrackingGuts,nb,NT,nMid,-1,device,mb.maxCount,mb.sendCounts,mb.sendParts);
     CHECK(hipEventRecord(mb.event));
     bool doA = true;
     bool doB = true;
@@ -248,7 +263,7 @@ void cycleTracking(MonteCarlo *monteCarlo)
       }
       if (doA) {
         ma.startRecvs();
-        CycleTrackingGuts<<<nb,NT>>>(0,-1,device,ma.maxCount,ma.sendCounts,ma.sendParts);
+        launchKernel(CycleTrackingGuts,nb,NT,0,-1,device,ma.maxCount,ma.sendCounts,ma.sendParts);
         CHECK(hipEventRecord(ma.event));
       }
       if (doB) {
@@ -260,7 +275,7 @@ void cycleTracking(MonteCarlo *monteCarlo)
       }
       if (doB) {
         mb.startRecvs();
-        CycleTrackingGuts<<<nb,NT>>>(0,-1,device,mb.maxCount,mb.sendCounts,mb.sendParts);
+        launchKernel(CycleTrackingGuts,nb,NT,0,-1,device,mb.maxCount,mb.sendCounts,mb.sendParts);
         CHECK(hipEventRecord(mb.event));
       }
     }

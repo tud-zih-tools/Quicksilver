@@ -83,7 +83,9 @@ class MC_Vector
       return MC_Vector(scalar*x, scalar*y, scalar*z);
    }
 
+#if defined(HAVE_HIP)
    __device__ inline double Length() const { return norm3d(x,y,z); }
+#endif
    __host__ inline double Length() const { return sqrt(x*x+y*y+z*z); }
 
    // Distance from this vector to another point.

@@ -74,7 +74,6 @@ namespace
    {
          int Ngpus = 0;
          CHECK(hipGetDeviceCount(&Ngpus));
-
          if( Ngpus != 0 )
          {
             monteCarlo->processor_info->use_gpu = 1;
@@ -86,9 +85,13 @@ namespace
          {
             monteCarlo->processor_info->use_gpu = 0;
             monteCarlo->processor_info->gpu_id = -1;
+            monteCarlo->processor_info->thread_target = 1;
          }
+
+#if defined(HAVE_HIP)
     if( monteCarlo->processor_info->use_gpu )
         warmup_kernel();
+#endif
 
          //printf("monteCarlo->processor_info->use_gpu = %d\n", monteCarlo->processor_info->use_gpu);
          

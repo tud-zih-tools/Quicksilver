@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "portability.hh"
+#include "cudaUtils.hh"
 #include "DeclareMacro.hh"
 
 class DirectionCosine

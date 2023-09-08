@@ -5,6 +5,7 @@
 // ToDo:  How much chaos would be caused by removing the default constructor?
 
 #include <string>
+#include "cudaUtils.hh"
 #include "DeclareMacro.hh"
 
 class  MC_Domain;

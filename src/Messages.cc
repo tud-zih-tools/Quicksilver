@@ -150,14 +150,14 @@ void Messages::addParticle(const MC_Base_Particle &part, const int buffer)
 }
 
 __global__ __launch_bounds__(1)
-static void recvInit(const int nReceived, int *__restrict__ const nProcessing, int *__restrict__ const nExtras)
+static void recvInit(KERNEL_ARGS const int nReceived, int *__restrict__ const nProcessing, int *__restrict__ const nExtras)
 {
   *nProcessing = *nExtras+nReceived;
   *nExtras = 0;
 }
 
 __global__ __launch_bounds__(64)
-static void recvCopy(const int nMessages, const int maxCount, const int totalCount, const int *const recvCounts, const MessageParticle *const recvParts, const int *const nParts, DeviceParticle *__restrict__ const parts)
+static void recvCopy(KERNEL_ARGS const int nMessages, const int maxCount, const int totalCount, const int *const recvCounts, const MessageParticle *const recvParts, const int *const nParts, DeviceParticle *__restrict__ const parts)
 {
   const int j = blockDim.x*blockIdx.x+threadIdx.x;
   int sumCount = 0;
@@ -182,10 +182,10 @@ void Messages::completeRecvs(Device &device)
     total += count;
   }
   std::swap(device.processing,device.extras);
-  recvInit<<<1,1>>>(total,device.particleSizes+Device::PROCESSING,device.particleSizes+Device::EXTRAS);
+  launchKernel(recvInit,1,1,total,device.particleSizes+Device::PROCESSING,device.particleSizes+Device::EXTRAS);
   static constexpr int nt = 64;
   const int nb = (total+nt-1)/nt;
-  recvCopy<<<nb,nt>>>(nMessages,maxCount,total,recvCounts,recvParts,device.particleSizes+Device::PROCESSING,device.processing);
+  launchKernel(recvCopy,nb,nt,nMessages,maxCount,total,recvCounts,recvParts,device.particleSizes+Device::PROCESSING,device.processing);
 }
 
 void Messages::completeSends()

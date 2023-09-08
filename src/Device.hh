@@ -153,7 +153,11 @@ struct DeviceParticle {
     that.velocity.y = velocity.y;
     that.velocity.z = velocity.z;
     {
+#if defined(HAVE_HIP)
       const double divSpeed = rnorm3d(velocity.x,velocity.y,velocity.z);
+#else
+      const double divSpeed = 1./sqrt(velocity.x*velocity.x+velocity.y*velocity.y+velocity.z*velocity.z);
+#endif
       that.direction_cosine.alpha = divSpeed*velocity.x;
       that.direction_cosine.beta = divSpeed*velocity.y;
       that.direction_cosine.gamma = divSpeed*velocity.z;

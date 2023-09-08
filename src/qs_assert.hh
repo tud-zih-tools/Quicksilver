@@ -1,3 +1,3 @@
-#include <cstdio>
+#include <cstdlib>
 
-#define qs_assert(cond) if (!(cond)) abort();
+#define qs_assert(cond) do { if (!(cond)) abort(); } while (0)
